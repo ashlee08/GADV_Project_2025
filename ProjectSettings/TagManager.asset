@@ -41,3 +41,21 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Backgroud
+    uniqueID: 4211154121
+    locked: 0
+  - name: WaterTiles
+    uniqueID: 3528731151
+    locked: 0
+  - name: GroundTiles
+    uniqueID: 3603239093
+    locked: 0
+  - name: Props
+    uniqueID: 3940173063
+    locked: 0
+  - name: Coin
+    uniqueID: 2236110735
+    locked: 0
+  - name: Player
+    uniqueID: 3235058881
+    locked: 0
