@@ -16,7 +16,7 @@ TagManager:
   - 
   - GroundLayer
   - PickUpItem
-  - Flood
+  - 
   - 
   - 
   - 
@@ -62,4 +62,7 @@ TagManager:
     locked: 0
   - name: Ocean
     uniqueID: 2199518913
+    locked: 0
+  - name: All
+    uniqueID: 4107709401
     locked: 0

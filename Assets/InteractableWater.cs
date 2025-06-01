@@ -38,7 +38,7 @@ public class InteractableWater : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        transform.Translate(Vector2.up * Time.deltaTime * 0.03f);
     }
 
     private void Reset()
