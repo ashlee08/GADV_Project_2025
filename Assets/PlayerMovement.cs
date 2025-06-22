@@ -16,6 +16,8 @@ public class PlayerMovement : MonoBehaviour
     public bool onGround = false;
     public float groundLine;
 
+    public bool inWater = false;
+
     public Animator animator;
     float horizontalMove = 0f;
 
@@ -71,7 +73,7 @@ public class PlayerMovement : MonoBehaviour
             Rb.velocity = new Vector2(0f, Rb.velocity.y);
         }
 
-        if (space && onGround)
+        if (space && (onGround || inWater))
         {
             // Rb.AddForce(new Vector2(0, playerJumpForce), ForceMode2D.Impulse);
             transform.position = new Vector3(transform.position.x, transform.position.y + 0.11f, transform.position.z);
@@ -92,6 +94,6 @@ public class PlayerMovement : MonoBehaviour
         Gizmos.color = Color.blue;
         Gizmos.DrawLine(transform.position, transform.position + Vector3.down * groundLine);
     }
-        
-    
+  
+
 }
