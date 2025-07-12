@@ -52,6 +52,9 @@ public class InteractableWater : MonoBehaviour
 
     private EdgeCollider2D _edgeCollider;
 
+    [Header("Gameplay")]
+    public float waterRisingSpeed = 0.03f; // Speed at which the water rises
+
     // Start is called before the first frame update
     void Start()
     {
@@ -63,7 +66,7 @@ public class InteractableWater : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.Translate(Vector2.up * Time.deltaTime * 0.03f);
+        transform.Translate(Vector2.up * Time.deltaTime * waterRisingSpeed);
     }
 
     private void FixedUpdate()
@@ -77,18 +80,6 @@ public class InteractableWater : MonoBehaviour
             point.pos += point.velocity * _speedMult * Time.fixedDeltaTime;
             _vertices[_topVerticesIndex[i]].y = point.pos;
             point.velocity += acceleration * _speedMult * Time.fixedDeltaTime;
-            //WaterPoint left = _waterPoints[i - 1];
-            //WaterPoint right = _waterPoints[i + 1];
-            //// spring force
-            //float leftForce = (left.pos - point.pos) * _spriteConstant;
-            //float rightForce = (right.pos - point.pos) * _spriteConstant;
-            //// damping force
-            //float leftDamping = (left.velocity - point.velocity) / _damping;
-            //float rightDamping = (right.velocity - point.velocity) / _damping;
-            //// spread force
-            //float spreadForce = (left.pos + right.pos - 2 * point.pos) / _spread;
-            //// update acceleration
-            //point.acceleration = leftForce + rightForce + leftDamping + rightDamping + spreadForce;
         }
 
         // Wave propogation

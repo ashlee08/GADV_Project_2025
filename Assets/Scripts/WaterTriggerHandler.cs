@@ -68,6 +68,8 @@ public class WaterTriggerHandler : MonoBehaviour
         {
             other.GetComponent<PlayerMovement>().inWater = true;
         }
+
+        // keep track of floating items on water surface
         if (rb != null && !floatingBodies.Contains(rb))
         {
             floatingBodies.Add(rb);
@@ -86,6 +88,8 @@ public class WaterTriggerHandler : MonoBehaviour
         {
             other.GetComponent<PlayerMovement>().inWater = false;
         }
+
+
         Rigidbody2D rb = other.GetComponent<Rigidbody2D>();
         if (rb != null && floatingBodies.Contains(rb))
         {
