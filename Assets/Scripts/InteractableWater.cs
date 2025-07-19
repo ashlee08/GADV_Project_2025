@@ -26,6 +26,8 @@ public class InteractableWater : MonoBehaviour
     [Header("Collision")]
     [SerializeField, Range(1f, 10f)] private float _playerCollisionRadiusMult = 4.15f;
 
+    public PlayerMovement playerMovement; // Reference to the player movement script, if needed for interaction
+    
     private class WaterPoint
     {
         public float velocity, acceleration, pos, targetHeight;
@@ -66,7 +68,11 @@ public class InteractableWater : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.Translate(Vector2.up * Time.deltaTime * waterRisingSpeed);
+        if (!playerMovement.inWater)
+        {
+            transform.Translate(Vector2.up * Time.deltaTime * waterRisingSpeed);
+        }
+       
     }
 
     private void FixedUpdate()

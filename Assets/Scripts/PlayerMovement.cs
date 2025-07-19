@@ -17,11 +17,13 @@ public class PlayerMovement : MonoBehaviour
     public float groundLine;
 
     public bool inWater = false;
+    public bool playerLose = false;
 
     public Animator animator;
     float horizontalMove = 0f;
 
     public Vector3 initialPosition;
+
 
     // Start is called before the first frame update
     void Start()
@@ -32,7 +34,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         // TO BE REMOVED, debugging purpose.
         if (Input.GetKey(KeyCode.R))
@@ -73,18 +75,23 @@ public class PlayerMovement : MonoBehaviour
             Rb.velocity = new Vector2(0f, Rb.velocity.y);
         }
 
-        if (space && (onGround || inWater))
+        if (space && onGround)
         {
             // Rb.AddForce(new Vector2(0, playerJumpForce), ForceMode2D.Impulse);
             transform.position = new Vector3(transform.position.x, transform.position.y + 0.11f, transform.position.z);
             Rb.velocity = new Vector2(Rb.velocity.x, playerJumpForce);
         }
 
+        if (inWater)
+        {
+            Rb.velocity = Vector2.zero; // Stop all movement in water
+        }
+
         // Animation
         horizontalMove = Input.GetAxisRaw("Horizontal") * playerSpeed;
-       
+        
 
-        animator.SetBool("IsJumping", !onGround);
+        animator.SetBool("IsJumping", (!onGround || inWater));
         animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
     }
 

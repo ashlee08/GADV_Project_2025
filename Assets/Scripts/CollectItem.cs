@@ -19,7 +19,13 @@ public class CollectItem : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Rubbish"))
         {
-            Destroy(collision.gameObject);
+            // prevent the rubbish on water to be picked up.
+            BoxCollider2D bc = collision.gameObject.GetComponent<BoxCollider2D>();
+            if (!bc.isTrigger)
+            {
+                Destroy(collision.gameObject);
+            }
+            
         }
     }
 

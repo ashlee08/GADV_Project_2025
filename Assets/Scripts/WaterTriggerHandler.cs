@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.LowLevel;
 
 public class WaterTriggerHandler : MonoBehaviour
 {
@@ -13,6 +14,16 @@ public class WaterTriggerHandler : MonoBehaviour
     private List<Transform> floatingTransforms = new List<Transform>();
     public float bounyancyStrength = 100f;
     public float bobblingStrength = 0.5f;
+    public PollutionBar pollution;
+    public GameObject gameOverPanel;
+
+    [Header("Rotation Effects")]
+    [SerializeField] public float _rotationStrength = 0.5f;
+    [SerializeField] public float _maxRotionForce = 2f;
+    [SerializeField] public float _surfaceTorqueMultiplier = 1.5f;
+    [SerializeField] private bool _randomizeRotationDirection = true;
+
+
     private void Awake()
     {
         _edgeColl = GetComponent<EdgeCollider2D>();
@@ -21,8 +32,38 @@ public class WaterTriggerHandler : MonoBehaviour
         _water = GetComponent<InteractableWater>();
     }
 
+    IEnumerator MakeTriggerAfterDelay(Collider2D col)
+    {
+        yield return new WaitForFixedUpdate();
+        if(col.isTrigger == false)
+        {
+            Logger.Equals("MakeTriggerAfterDelay", "Making trigger for " + col.name);
+            pollution.AddPollution(1);
+            col.isTrigger = true;
+        }
+        
+    }
+
+    private void ApplyRotationForce(Rigidbody2D rb, float force, bool isInitialImpact)
+    {
+        float direction = _randomizeRotationDirection ? (Random.value > 0.5f ? 1f : -1f) : Mathf.Sign(rb.velocity.x);
+        float torqueForce;
+        if (isInitialImpact)
+        {
+            // Apply a stronger force on initial impact
+            torqueForce = Mathf.Min(force * _rotationStrength * _surfaceTorqueMultiplier, _maxRotionForce * 2f);
+        }
+        else
+        {
+            // Apply a normal force for continuous rotation
+            torqueForce = Mathf.Min(force * _rotationStrength * 0.1f, _maxRotionForce);
+        }
+        rb.AddTorque(torqueForce * direction, ForceMode2D.Force);
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
+        
         if ((_waterMask.value & (1 << other.gameObject.layer)) > 0)
         {
             Rigidbody2D rb = other.GetComponent<Rigidbody2D>();
@@ -32,6 +73,7 @@ public class WaterTriggerHandler : MonoBehaviour
             }
             if (rb != null)
             {
+                
                 Vector2 localPos = gameObject.transform.localPosition;
                 Vector2 hitObjectPos = other.transform.position;
                 Bounds hitObjectBounds = other.bounds;
@@ -51,22 +93,28 @@ public class WaterTriggerHandler : MonoBehaviour
                 vel = Mathf.Clamp(Mathf.Abs(vel), 0f, _water.MaxForce);
                 vel*= multiplier;
                 _water.Splash(other, vel);
+                // Appy rotation force
+                ApplyRotationForce(rb, vel, true);
             }
         }
 
-        //if (other.CompareTag("Rubbish"))
-        //{
-        //    if (!floatingTransforms.Contains(other.transform))
-        //        floatingTransforms.Add(other.transform);
-        //}
     }
 
     private void OnTriggerStay2D(Collider2D other)
     {
         Rigidbody2D rb = other.GetComponent<Rigidbody2D>();
-        if(other.tag == "Player")
+        if (other.tag == "Player")
         {
             other.GetComponent<PlayerMovement>().inWater = true;
+            gameOverPanel.SetActive(true);
+        }
+
+
+        if(other.tag == "Rubbish" && other.isTrigger == false)
+        {
+            // a delay way to make sure set isTrigger to true after the collision
+            // so that the rubbish cannot be picked up by player.
+            StartCoroutine(MakeTriggerAfterDelay(other));
         }
 
         // keep track of floating items on water surface
@@ -75,11 +123,6 @@ public class WaterTriggerHandler : MonoBehaviour
             floatingBodies.Add(rb);
         }
 
-        //if (other.CompareTag("Rubbish"))
-        //{
-        //    if (!floatingTransforms.Contains(other.transform))
-        //        floatingTransforms.Add(other.transform);
-        //}
     }
 
     private void OnTriggerExit2D(Collider2D other)
@@ -96,10 +139,6 @@ public class WaterTriggerHandler : MonoBehaviour
             floatingBodies.Remove(rb);
         }
 
-        //if (other.CompareTag("Rubbish") && floatingTransforms.Contains(other.transform))
-        //{
-        //       floatingTransforms.Remove(other.transform);
-        //}
     }
     private void Update()
     {
@@ -147,6 +186,11 @@ public class WaterTriggerHandler : MonoBehaviour
             float bobAmount = Mathf.Sin(Time.time * 3f + rb.position.x * 0.5f) * bobblingStrength;
             rb.AddForce(Vector2.up * bobAmount, ForceMode2D.Force);
             //Debug.Log($"Inside Water: {depth}");
+
+            if(Mathf.Abs(rb.angularVelocity) < _maxRotionForce * 2f)
+            {
+                ApplyRotationForce(rb, depth, false);
+            }
         }
     }
 

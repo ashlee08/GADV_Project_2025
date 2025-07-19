@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class MovingPlatform : MonoBehaviour
 {
@@ -23,11 +24,17 @@ public class MovingPlatform : MonoBehaviour
     private Vector3 targetPosition;
     private bool isPaused = false;
     private float pauseTimer = 0f;
+    //private Rigidbody2D rb;
+    //private Vector3 delta;
+
+    //private Vector3 previousPosition;
+    //private List<Rigidbody2D> passengers = new List<Rigidbody2D>();
 
     void Start()
     {
+        //rb = GetComponent<Rigidbody2D>();
         startPosition = transform.position;
-
+        //previousPosition = startPosition;
         switch (moveDirection)
         {
             case Direction.Up:
@@ -45,7 +52,7 @@ public class MovingPlatform : MonoBehaviour
         }
     }
 
-    void Update()
+    void FixedUpdate()
     {
 
         // If movement is disabled or paused, count down the pause timer
@@ -68,7 +75,22 @@ public class MovingPlatform : MonoBehaviour
 
         // Move toward the current destination
         Vector3 destination = moveToTarget ? targetPosition : startPosition;
-        transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.deltaTime);
+        Vector3 newPos = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.deltaTime);
+        transform.position = newPos;
+        //delta = newPos - transform.position;
+        //rb.MovePosition(newPos);
+        //// Apply delta to passengers
+        //foreach (var passenger in passengers)
+        //{
+        //    if (passenger != null)
+        //    {
+        //        passenger.MovePosition(passenger.position + (Vector2)delta);
+        //    }
+        //}
+        
+
+        
+        //previousPosition = newPos;
 
         // Check if we've reached the destination
         if (Vector3.Distance(transform.position, destination) < 0.01f)
@@ -78,4 +100,25 @@ public class MovingPlatform : MonoBehaviour
             transform.position = destination;
         }
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        //if (collision.rigidbody != null && !passengers.Contains(collision.rigidbody))
+        //{
+        //    passengers.Add(collision.rigidbody);
+        //}
+        collision.transform.SetParent(transform); // Set parent to the platform to move with it
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        //if (collision.rigidbody != null)
+        //{
+        //    passengers.Remove(collision.rigidbody);
+        //}
+        collision.transform.SetParent(null); // Remove parent to stop moving with the platform
+    }
+
+
+
 }
