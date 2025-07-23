@@ -17,7 +17,7 @@ public class PlayerMovement : MonoBehaviour
     public float groundLine;
 
     public bool inWater = false;
-    public bool playerLose = false;
+    public bool gameEnd = false;
 
     public Animator animator;
     float horizontalMove = 0f;
@@ -31,15 +31,20 @@ public class PlayerMovement : MonoBehaviour
         // Take the ridgidBody 2d of game object with PlayerMovement script, and initialize Rb variable.
         Rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        gameEnd = false; // Initialize gameEnd to false
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
         // TO BE REMOVED, debugging purpose.
-        if (Input.GetKey(KeyCode.R))
+        //if (Input.GetKey(KeyCode.R))
+        //{
+        //    transform.position = initialPosition;
+        //}
+        if (gameEnd)
         {
-            transform.position = initialPosition;
+            return; // If game has ended, do not process any movement or actions.
         }
 
         // from the player position, casting downward to find a collision with groundLayer within distance groundLine.

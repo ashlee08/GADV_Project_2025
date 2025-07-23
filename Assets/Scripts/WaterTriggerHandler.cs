@@ -107,6 +107,15 @@ public class WaterTriggerHandler : MonoBehaviour
         {
             other.GetComponent<PlayerMovement>().inWater = true;
             gameOverPanel.SetActive(true);
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                PlayerMovement movement = player.GetComponent<PlayerMovement>();
+                if (movement != null)
+                {
+                    movement.gameEnd = true; // Set gameEnd to true
+                }
+            }
         }
 
 

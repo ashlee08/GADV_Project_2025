@@ -35,6 +35,15 @@ public class PollutionBar : MonoBehaviour
         if(targetPollution >= 1f)
         {
             gameOverPanel.SetActive(true); // Show game over panel when pollution reaches max
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                PlayerMovement movement = player.GetComponent<PlayerMovement>();
+                if (movement != null)
+                {
+                    movement.gameEnd = true; // Set gameEnd to true
+                }
+            }
         }
     }
 

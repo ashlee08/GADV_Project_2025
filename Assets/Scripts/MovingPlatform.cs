@@ -100,24 +100,36 @@ public class MovingPlatform : MonoBehaviour
             transform.position = destination;
         }
     }
-
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        //if (collision.rigidbody != null && !passengers.Contains(collision.rigidbody))
-        //{
-        //    passengers.Add(collision.rigidbody);
-        //}
-        collision.transform.SetParent(transform); // Set parent to the platform to move with it
+        if (!gameObject.activeInHierarchy || !collision.gameObject.activeInHierarchy) return;
+
+        collision.transform.SetParent(transform);
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        //if (collision.rigidbody != null)
-        //{
-        //    passengers.Remove(collision.rigidbody);
-        //}
-        collision.transform.SetParent(null); // Remove parent to stop moving with the platform
+        if (!gameObject.activeInHierarchy || !collision.gameObject.activeInHierarchy) return;
+
+        collision.transform.SetParent(null);
     }
+
+    // walkling on moving platform buggy, so commented out for now
+    //private void OnCollisionEnter2D(Collision2D collision)
+    //{
+    //    //if (collision.rigidbody != null && !passengers.Contains(collision.rigidbody))
+    //    //{
+    //    //    passengers.Add(collision.rigidbody);
+    //    //}
+    //}
+
+    //private void OnCollisionExit2D(Collision2D collision)
+    //{
+    //    //if (collision.rigidbody != null)
+    //    //{
+    //    //    passengers.Remove(collision.rigidbody);
+    //    //}
+    //}
 
 
 
