@@ -15,6 +15,8 @@ public class PlayerMovement : MonoBehaviour
     [Header("Collision")] // optional, just look nicer in unity editor.
     public bool onGround = false;
     public float groundLine;
+    public float climbSpeed = 3f;
+    public bool isClimbing = false;
 
     public bool inWater = false;
     public bool gameEnd = false;
@@ -23,6 +25,8 @@ public class PlayerMovement : MonoBehaviour
     float horizontalMove = 0f;
 
     public Vector3 initialPosition;
+    private float snappedX;
+
 
 
     // Start is called before the first frame update
@@ -91,12 +95,25 @@ public class PlayerMovement : MonoBehaviour
         {
             Rb.velocity = Vector2.zero; // Stop all movement in water
         }
+        else if (isClimbing)
+        {
+            float vertical = Input.GetAxisRaw("Vertical");
+            Rb.gravityScale = 0f;
+            // Lock horizontal movement and snap to ladder's X
+            transform.position = new Vector3(snappedX, transform.position.y, transform.position.z);
+
+            Rb.velocity = new Vector2(0f, vertical * climbSpeed);
+        }
+        else
+        {
+            Rb.gravityScale = 1f; // Ensure gravity is restored
+        }
 
         // Animation
         horizontalMove = Input.GetAxisRaw("Horizontal") * playerSpeed;
         
 
-        animator.SetBool("IsJumping", (!onGround || inWater));
+        animator.SetBool("IsJumping", (!onGround || inWater || isClimbing));
         animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
     }
 
@@ -106,6 +123,29 @@ public class PlayerMovement : MonoBehaviour
         Gizmos.color = Color.blue;
         Gizmos.DrawLine(transform.position, transform.position + Vector3.down * groundLine);
     }
-  
 
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Ladder"))
+        {
+            if (Input.GetKey(KeyCode.W))
+            {
+                isClimbing = true;
+
+                // Snap player to the center X of the ladder
+                snappedX = other.bounds.center.x;
+                transform.position = new Vector3(snappedX, transform.position.y, transform.position.z);
+                Rb.velocity = Vector2.zero;
+            }
+            
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Ladder"))
+        {
+            isClimbing = false;
+        }
+    }
 }

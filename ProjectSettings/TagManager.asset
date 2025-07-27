@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Rubbish
   - WinningDoor
+  - Ladder
+  - BurningFire
   layers:
   - Default
   - TransparentFX
