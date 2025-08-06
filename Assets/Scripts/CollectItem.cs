@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro; // TextMeshPro namespace for UI text
+using TMPro;
+using System.Security.Cryptography.X509Certificates; // TextMeshPro namespace for UI text
 
 public class CollectItem : MonoBehaviour
 {
@@ -15,12 +16,18 @@ public class CollectItem : MonoBehaviour
     public GameObject star1;
     public GameObject star2;
     public GameObject star3;
+    [Header("Sound Audio")]
+    public AudioSource audioSource;
+    public AudioClip pickUpSound;
+    public AudioClip winSound;
+
     // Start is called before the first frame update
     void Start()
     {
         // Grab total item from Tag "Rubbish"
         GameObject[] items = GameObject.FindGameObjectsWithTag("Rubbish");
         totalItems = items.Length; // Count the total number of items
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -37,9 +44,11 @@ public class CollectItem : MonoBehaviour
         {
 
             PlayerMovement movement = GetComponent<PlayerMovement>();
-            if (movement != null)
+            if (movement != null && movement.gameEnd == false)
             {
                 movement.gameEnd = true; // Set gameEnd to true
+                audioSource.PlayOneShot(winSound);
+                movement.gameCamera.StopBGM(); // Stop the background music
             }
             winPanel.SetActive(true);
             float percentage = (float)pickupCount / totalItems;
@@ -82,6 +91,7 @@ public class CollectItem : MonoBehaviour
                 pickupCount++;
                 itemCountText.text = $"{pickupCount}";
                 Destroy(collision.gameObject);
+                audioSource.PlayOneShot(pickUpSound);
             }
 
         }

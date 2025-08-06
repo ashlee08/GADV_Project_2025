@@ -41,7 +41,7 @@ public class PollutionBar : MonoBehaviour
                 PlayerMovement movement = player.GetComponent<PlayerMovement>();
                 if (movement != null)
                 {
-                    movement.gameEnd = true; // Set gameEnd to true
+                    movement.loseGame();
                 }
             }
         }

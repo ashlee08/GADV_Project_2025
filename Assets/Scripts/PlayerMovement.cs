@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Animations;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -27,7 +28,13 @@ public class PlayerMovement : MonoBehaviour
     public Vector3 initialPosition;
     private float snappedX;
 
-
+    [Header("Sound Audio")]
+    public AudioSource audioSource;
+    public AudioClip walkSound;
+    public AudioClip jumpSound;
+    public AudioClip loseSound;
+    public AudioClip flameSound; // when someone touch the fire.
+    public GameCamera gameCamera; // Reference to the GameCamera script
 
     // Start is called before the first frame update
     void Start()
@@ -35,7 +42,24 @@ public class PlayerMovement : MonoBehaviour
         // Take the ridgidBody 2d of game object with PlayerMovement script, and initialize Rb variable.
         Rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
+        audioSource.volume = 1f;
         gameEnd = false; // Initialize gameEnd to false
+    }
+
+    public void playerBurnt()
+    {
+        audioSource.PlayOneShot(flameSound); // Play the flame sound when player is burnt
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        sr.color = new Color(0.474f, 0.474f, 0.471f); // Burnt color
+    }
+
+    public void loseGame()
+    {
+        gameCamera.StopBGM(); // Stop the background music
+        gameEnd = true; // Set gameEnd to true
+        audioSource.volume = 0.1f; // Ensure volume is set to 1 for the lose sound
+        audioSource.PlayOneShot(loseSound);
     }
 
     // Update is called once per frame
@@ -48,6 +72,9 @@ public class PlayerMovement : MonoBehaviour
         //}
         if (gameEnd)
         {
+            animator.SetBool("IsJumping", false);
+            animator.SetFloat("Speed", 0f);
+            Rb.velocity = Vector2.zero; // Stop all movement
             return; // If game has ended, do not process any movement or actions.
         }
 
@@ -89,6 +116,16 @@ public class PlayerMovement : MonoBehaviour
             // Rb.AddForce(new Vector2(0, playerJumpForce), ForceMode2D.Impulse);
             transform.position = new Vector3(transform.position.x, transform.position.y + 0.11f, transform.position.z);
             Rb.velocity = new Vector2(Rb.velocity.x, playerJumpForce);
+            if (audioSource.clip != jumpSound)
+            {
+                audioSource.Stop();
+            }
+            if (!audioSource.isPlaying)
+            {
+                audioSource.clip = jumpSound;
+                audioSource.loop = false;
+                audioSource.Play();
+            }
         }
 
         if (inWater)
@@ -111,10 +148,30 @@ public class PlayerMovement : MonoBehaviour
 
         // Animation
         horizontalMove = Input.GetAxisRaw("Horizontal") * playerSpeed;
-        
+
 
         animator.SetBool("IsJumping", (!onGround || inWater || isClimbing));
         animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
+
+        
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        if (stateInfo.IsName("Run_Anim"))
+        {
+            if (!audioSource.isPlaying)
+            {
+                audioSource.clip = walkSound;
+                audioSource.loop = true;
+                audioSource.Play();
+            }
+        }
+        else if (!stateInfo.IsName("Run_Anim"))
+        {
+            if (audioSource.isPlaying)
+            {
+                audioSource.loop = false;
+            }
+        }
+        
     }
 
     private void OnDrawGizmos()
@@ -137,7 +194,7 @@ public class PlayerMovement : MonoBehaviour
                 transform.position = new Vector3(snappedX, transform.position.y, transform.position.z);
                 Rb.velocity = Vector2.zero;
             }
-            
+
         }
     }
 

@@ -12,6 +12,8 @@ public class GameCamera : MonoBehaviour
     public float minX = -10f;
     public float maxX = 10f;
 
+    public AudioSource audioBGMSource;
+
     private void LateUpdate()
     {
         if (target != null)
@@ -26,6 +28,14 @@ public class GameCamera : MonoBehaviour
             smoothedPosition.z = -10;
 
             transform.position = smoothedPosition;
+        }
+    }
+
+    public void StopBGM()
+    {
+        if (audioBGMSource != null && audioBGMSource.isPlaying)
+        {
+            audioBGMSource.Stop();
         }
     }
 }
