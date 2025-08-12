@@ -37,9 +37,16 @@ public class WaterTriggerHandler : MonoBehaviour
         yield return new WaitForFixedUpdate();
         if(col.isTrigger == false)
         {
-            Logger.Equals("MakeTriggerAfterDelay", "Making trigger for " + col.name);
-            pollution.AddPollution(1);
+            if(col.tag == "Rubbish")
+            {
+                Logger.Equals("MakeTriggerAfterDelay", "Making trigger for " + col.name);
+                pollution.AddPollution(1);
+            }
+
             col.isTrigger = true;
+            col.transform.SetParent(null);
+            col.attachedRigidbody.freezeRotation = false; // Unfreeze rotation to allow water effects
+            col.attachedRigidbody.angularVelocity = 0f;
         }
         
     }
@@ -118,8 +125,8 @@ public class WaterTriggerHandler : MonoBehaviour
             }
         }
 
-
-        if(other.tag == "Rubbish" && other.isTrigger == false)
+        // Rubbish or Player need to set IsTrigger to true to float on water without getting picked up by moving platforms.
+        if((other.tag == "Rubbish" || other.tag == "Player") && other.isTrigger == false)
         {
             // a delay way to make sure set isTrigger to true after the collision
             // so that the rubbish cannot be picked up by player.

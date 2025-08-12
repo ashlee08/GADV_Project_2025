@@ -68,7 +68,7 @@ public class InteractableWater : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!playerMovement.inWater)
+        if (playerMovement && !playerMovement.inWater)
         {
             transform.Translate(Vector2.up * Time.deltaTime * waterRisingSpeed);
         }
