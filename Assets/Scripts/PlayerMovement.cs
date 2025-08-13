@@ -23,6 +23,7 @@ public class PlayerMovement : MonoBehaviour
     public bool gameEnd = false;
 
     public Animator animator;
+    public Sprite deadSprite;
     float horizontalMove = 0f;
 
     public Vector3 initialPosition;
@@ -52,6 +53,8 @@ public class PlayerMovement : MonoBehaviour
         audioSource.PlayOneShot(flameSound); // Play the flame sound when player is burnt
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         sr.color = new Color(0.474f, 0.474f, 0.471f); // Burnt color
+        animator.enabled = false; // Disable animator to stop animations
+        sr.sprite = deadSprite; // Change sprite to dead sprite
     }
 
     public void loseGame()
@@ -60,6 +63,10 @@ public class PlayerMovement : MonoBehaviour
         gameEnd = true; // Set gameEnd to true
         audioSource.volume = 0.1f; // Ensure volume is set to 1 for the lose sound
         audioSource.PlayOneShot(loseSound);
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        animator.enabled = false; // Disable animator to stop animations
+        sr.sprite = deadSprite; // Change sprite to dead sprite
+
     }
 
     // Update is called once per frame
@@ -75,6 +82,10 @@ public class PlayerMovement : MonoBehaviour
             animator.SetBool("IsJumping", false);
             animator.SetFloat("Speed", 0f);
             Rb.velocity = Vector2.zero; // Stop all movement
+            if (audioSource.isPlaying)
+            {
+                audioSource.loop = false;
+            }
             return; // If game has ended, do not process any movement or actions.
         }
 

@@ -1,0 +1,146 @@
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+public class SettingsController : MonoBehaviour
+{
+    [Header("UI")]
+    public RectTransform highlightPanel;       // The panel you want to move
+    public List<TextMeshProUGUI> items;
+    public Vector3 targetPosition;    // Target local position in the parent
+    public GameObject HowToPlayPanel;
+
+    [Header("Movement")]
+    public float smoothTime = 0.08f;                // highlightPanel easing
+    private Vector3 vel;
+
+    private int index = 0;
+    private Vector3 targetLocalPos;
+
+    public GamePause gamePause; // Reference to the GamePause script
+    public Image targetImage;          
+    public Sprite unmuteSprite;
+    public Sprite muteSprite;
+    // Start is called before the first frame update
+    void Start()
+    {
+        if (items == null || items.Count == 0) return;
+
+        Select(index, immediate: true);
+    }
+    public void ToggleSound()
+    {
+        AudioListener.volume = AudioListener.volume == 0 ? 1 : 0; // Toggle mute
+        targetImage.sprite = AudioListener.volume == 0 ? muteSprite : unmuteSprite; // Update icon
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (items == null || items.Count == 0) return;
+
+        // Up (W / UpArrow)
+        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            index = (index - 1 + items.Count) % items.Count;
+            Select(index, immediate: false);
+        }
+
+        // Down (S / DownArrow)
+        if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            index = (index + 1) % items.Count;
+            Select(index, immediate: false);
+        }
+
+        // Enter
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            PerformAction(index);
+        }
+
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            ToggleSound();
+        }
+
+        // Smoothly move highlightPanel
+        if (highlightPanel != null)
+        {
+            highlightPanel.localPosition = Vector3.SmoothDamp(
+                highlightPanel.localPosition,
+                targetLocalPos,
+                ref vel,
+                smoothTime,
+                Mathf.Infinity,
+                Time.unscaledDeltaTime
+            );
+        }
+    }
+
+    void Select(int newIndex, bool immediate)
+    {
+
+        // Move target to selected item's local position (align Y, keep current X/Z)
+        if (highlightPanel != null && items[newIndex] != null)
+        {
+            var itemRT = items[newIndex].GetComponent<RectTransform>();
+            var hParent = highlightPanel.parent as RectTransform;
+            var iParent = itemRT.parent as RectTransform;
+
+            // Assumes highlightPanel and items share the same parent. If not, convert space:
+            Vector3 itemLocal = itemRT.localPosition;
+            if (hParent != iParent)
+            {
+                // Convert to world then to highlightPanel parent local space
+                Vector3 world = itemRT.TransformPoint(Vector3.zero);
+                itemLocal = hParent.InverseTransformPoint(world);
+            }
+
+            targetLocalPos = new Vector3(highlightPanel.localPosition.x, itemLocal.y, highlightPanel.localPosition.z);
+
+            if (immediate)
+                highlightPanel.localPosition = targetLocalPos;
+        }
+    }
+
+    public void RestartScene()
+    {
+        // Reload the current scene
+        gamePause.ResumeGame(); // Ensure the game is resumed before reloading
+        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+    }
+
+    void PerformAction(int selected)
+    {
+        switch (selected)
+        {
+            case 0:
+                Debug.Log("Action 0: Resume");
+                gamePause.ResumeGame();
+                break;
+            case 1:
+                Debug.Log("Action 1: How To Play");
+                gameObject.SetActive(false);
+                HowToPlayPanel.SetActive(true);
+                break;
+            case 2:
+                Debug.Log("Action 1: Restart");
+                RestartScene();
+                break;
+            case 3:
+                Debug.Log("Action 2: Main Menu");
+                gamePause.ResumeGame(); // Ensure the game is resumed before loading new scene
+                SceneManager.LoadScene("MainMenu");
+                break;
+            default:
+                Debug.Log($"Action {selected}: Not assigned");
+                break;
+        }
+    }
+}

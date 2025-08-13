@@ -75,6 +75,18 @@ public class InteractableWater : MonoBehaviour
        
     }
 
+    public void PolluteWater()
+    {
+        Color currentColor = _renderer.material.GetColor("_BodyColor");
+        currentColor.r = currentColor.r * 0.2f;
+        currentColor.g = currentColor.g * 0.2f;
+        currentColor.b = currentColor.b * 0.2f;
+        float waterTransparency = _renderer.material.GetFloat("_BodyTransparency");
+        waterTransparency -= 0.2f; 
+        _renderer.material.SetColor("_BodyColor", currentColor);
+        _renderer.material.SetFloat("_BodyTransparency", waterTransparency);
+    }
+
     private void FixedUpdate()
     {
         //update all spring positions

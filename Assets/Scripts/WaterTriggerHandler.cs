@@ -41,6 +41,7 @@ public class WaterTriggerHandler : MonoBehaviour
             {
                 Logger.Equals("MakeTriggerAfterDelay", "Making trigger for " + col.name);
                 pollution.AddPollution(1);
+                _water.PolluteWater();
             }
 
             col.isTrigger = true;
