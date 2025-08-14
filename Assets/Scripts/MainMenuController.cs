@@ -60,7 +60,9 @@ public class MainMenuController : MonoBehaviour
                 highlightPanel.localPosition,
                 targetLocalPos,
                 ref vel,
-                smoothTime
+                smoothTime,
+                Mathf.Infinity,
+                Time.unscaledDeltaTime
             );
         }
     }

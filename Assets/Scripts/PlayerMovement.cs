@@ -217,3 +217,5 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 }
+
+// reference: https://www.youtube.com/playlist?list=PL30AETbxgR-duEOClvm8lBZqeCljPe-sI

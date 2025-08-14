@@ -35,9 +35,9 @@ public class WaterTriggerHandler : MonoBehaviour
     IEnumerator MakeTriggerAfterDelay(Collider2D col)
     {
         yield return new WaitForFixedUpdate();
-        if(col.isTrigger == false)
+        if (col.isTrigger == false)
         {
-            if(col.tag == "Rubbish")
+            if (col.tag == "Rubbish")
             {
                 Logger.Equals("MakeTriggerAfterDelay", "Making trigger for " + col.name);
                 pollution.AddPollution(1);
@@ -49,7 +49,7 @@ public class WaterTriggerHandler : MonoBehaviour
             col.attachedRigidbody.freezeRotation = false; // Unfreeze rotation to allow water effects
             col.attachedRigidbody.angularVelocity = 0f;
         }
-        
+
     }
 
     private void ApplyRotationForce(Rigidbody2D rb, float force, bool isInitialImpact)
@@ -71,7 +71,7 @@ public class WaterTriggerHandler : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        
+
         if ((_waterMask.value & (1 << other.gameObject.layer)) > 0)
         {
             Rigidbody2D rb = other.GetComponent<Rigidbody2D>();
@@ -81,12 +81,12 @@ public class WaterTriggerHandler : MonoBehaviour
             }
             if (rb != null)
             {
-                
+
                 Vector2 localPos = gameObject.transform.localPosition;
                 Vector2 hitObjectPos = other.transform.position;
                 Bounds hitObjectBounds = other.bounds;
                 Vector3 spawnPos = Vector3.zero;
-                if(other.transform.position.y >= _edgeColl.points[1].y + _edgeColl.offset.y + localPos.y)
+                if (other.transform.position.y >= _edgeColl.points[1].y + _edgeColl.offset.y + localPos.y)
                 {
                     spawnPos = hitObjectPos - new Vector2(0, hitObjectBounds.extents.y);
                 }
@@ -96,10 +96,10 @@ public class WaterTriggerHandler : MonoBehaviour
                 }
 
                 // clamp splash point to a MAX velocity
-                int multiplier = (rb.velocity.y < 0)?-1:1;
+                int multiplier = (rb.velocity.y < 0) ? -1 : 1;
                 float vel = rb.velocity.y * _water.ForceMultiplier;
                 vel = Mathf.Clamp(Mathf.Abs(vel), 0f, _water.MaxForce);
-                vel*= multiplier;
+                vel *= multiplier;
                 _water.Splash(other, vel);
                 // Appy rotation force
                 ApplyRotationForce(rb, vel, true);
@@ -127,7 +127,7 @@ public class WaterTriggerHandler : MonoBehaviour
         }
 
         // Rubbish or Player need to set IsTrigger to true to float on water without getting picked up by moving platforms.
-        if((other.tag == "Rubbish" || other.tag == "Player") && other.isTrigger == false)
+        if ((other.tag == "Rubbish" || other.tag == "Player") && other.isTrigger == false)
         {
             // a delay way to make sure set isTrigger to true after the collision
             // so that the rubbish cannot be picked up by player.
@@ -191,7 +191,7 @@ public class WaterTriggerHandler : MonoBehaviour
             if (depth > 0.1f)
             {
                 // 1. Buoyancy force (stronger the deeper you go)
-                float buoyancyForce = Mathf.Clamp(depth * bounyancyStrength, 0f, bounyancyStrength*10);
+                float buoyancyForce = Mathf.Clamp(depth * bounyancyStrength, 0f, bounyancyStrength * 10);
                 rb.AddForce(Vector2.up * buoyancyForce, ForceMode2D.Force);
             }
 
@@ -204,7 +204,7 @@ public class WaterTriggerHandler : MonoBehaviour
             rb.AddForce(Vector2.up * bobAmount, ForceMode2D.Force);
             //Debug.Log($"Inside Water: {depth}");
 
-            if(Mathf.Abs(rb.angularVelocity) < _maxRotionForce * 2f)
+            if (Mathf.Abs(rb.angularVelocity) < _maxRotionForce * 2f)
             {
                 ApplyRotationForce(rb, depth, false);
             }
@@ -214,7 +214,9 @@ public class WaterTriggerHandler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
 }
+
+// reference: https://www.youtube.com/watch?v=TbGEKpdsmCI 

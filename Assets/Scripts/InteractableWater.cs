@@ -139,11 +139,7 @@ public class InteractableWater : MonoBehaviour
         return distanceSquared <= radius*radius;
     }
 
-    private void Reset()
-    {
-        _edgeCollider = GetComponent<EdgeCollider2D>();
-        _edgeCollider.isTrigger = true;
-    }
+
 
     // For editor use
     public void ResetEdgeCollider()
